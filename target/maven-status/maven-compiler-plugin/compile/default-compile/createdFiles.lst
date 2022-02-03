@@ -1,0 +1,4 @@
+com\Gens\plugin\commands\UsernameChange.class
+com\Gens\plugin\Changer.class
+com\Gens\plugin\events\EmulatorLoaded.class
+com\Gens\plugin\utils\Extras.class
