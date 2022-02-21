@@ -48,6 +48,13 @@ public class UsernameChange extends Command {
                                 ServerMessage message = new ForwardToRoomComposer(room.getId()).compose();
                                 user.getClient().sendResponse(message);
 
+                                for (Room userRoom : Emulator.getGameEnvironment().getRoomManager().getRoomsForHabbo(user)) {
+                                    userRoom.setOwnerName(newUsername);
+                                    userRoom.setNeedsUpdate(true);
+                                    userRoom.save();
+                                    Emulator.getGameEnvironment().getRoomManager().unloadRoom(userRoom);
+                                }
+
                             }
                         }, 1000);
 
@@ -55,6 +62,11 @@ public class UsernameChange extends Command {
                         updateUser.setString(1,newUsername);
                         updateUser.setInt(2,user.getHabboInfo().getId());
                         updateUser.executeUpdate();
+
+                        PreparedStatement updateRooms = connection.prepareStatement("UPDATE rooms SET owner_name = ? WHERE owner_id = ?");
+                        updateRooms.setString(1,newUsername);
+                        updateRooms.setInt(2,user.getHabboInfo().getId());
+                        updateRooms.executeUpdate();
 
                     } else {
                         user.whisper(Emulator.getTexts().getValue("usernameChanger.cmd.error.alreadyTaken").replace("%newname%",newUsername));
